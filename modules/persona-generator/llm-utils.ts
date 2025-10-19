@@ -16,7 +16,7 @@ export function getGeminiModel<T extends z.ZodTypeAny>(
     apiKey: env.GEMINI_API_KEY,
     model: "gemini-2.5-flash",
     temperature: 0.7,
-    maxOutputTokens: 2048,
+    maxOutputTokens: 4096,
   });
 
   // If a schema is provided → return a structured-output model
