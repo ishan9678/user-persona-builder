@@ -1,10 +1,11 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { getGeminiModel, formatJsonResponse } from './llm-utils';
+import { getGeminiModel } from './llm-utils';
 import {
   WorkflowStateSchema,
   ProductProfileSchema,
   CustomerProfileSchema,
   UserPersonaSchema,
+  PersonasArraySchema,
   type WorkflowState,
   type ProductProfile,
   type CustomerProfile,
@@ -14,38 +15,31 @@ import {
 // Node 1: Create Product Profile
 async function createProductProfile(state: WorkflowState): Promise<Partial<WorkflowState>> {
   try {
-    const model = getGeminiModel();
+    const model = getGeminiModel({ schema: ProductProfileSchema, jsonMode: true });
     
     const prompt = `Analyze the following website content and create a detailed product profile.
 
 Website Content:
 ${state.scrapedContent}
 
-Create a comprehensive product profile in JSON format with the following structure:
-{
-  "name": "Product/Service Name",
-  "category": "Industry category",
-  "keyFeatures": ["feature1", "feature2", "feature3"],
-  "valueProposition": "Main value proposition",
-  "targetMarket": "Primary target market",
-  "brandPersonality": "Brand personality description",
-  "visualIdentity": {
-    "colorScheme": "Description of color scheme",
-    "typography": "Typography style",
-    "designStyle": "Overall design style (modern, minimalist, bold, etc.)"
-  }
-}
+Create a comprehensive product profile with:
+- Product/Service name
+- Industry category
+- Key features (at least 3)
+- Main value proposition
+- Primary target market
+- Brand personality description
+- Visual identity (color scheme, typography, design style)
 
-Respond with ONLY the JSON object, no additional text.`;
+Focus on extracting concrete information from the website content provided.`;
 
-    const response = await model.invoke([new HumanMessage(prompt)]);
-    const productProfile = formatJsonResponse(response.content.toString());
+    const productProfile = await model.invoke(prompt);
+
+    console.log('Product Profile:', productProfile);
     
-    // Validate the response
-    const validatedProfile = ProductProfileSchema.parse(productProfile);
-    
-    return { productProfile: validatedProfile };
+    return { productProfile };
   } catch (error) {
+    console.error('Product profile error:', error);
     return { 
       error: `Product profile generation failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
     };
@@ -59,33 +53,30 @@ async function createCustomerProfile(state: WorkflowState): Promise<Partial<Work
       throw new Error('Product profile is required');
     }
 
-    const model = getGeminiModel();
+    const model = getGeminiModel({ schema: CustomerProfileSchema, jsonMode: true });
     
     const prompt = `Based on the following product profile, create an ideal customer profile.
 
 Product Profile:
 ${JSON.stringify(state.productProfile, null, 2)}
 
-Create a comprehensive ideal customer profile in JSON format with the following structure:
-{
-  "industrySegment": "Target industry segment",
-  "companySize": "Company size (if B2B) or demographic segment (if B2C)",
-  "keyNeeds": ["need1", "need2", "need3"],
-  "painPoints": ["pain1", "pain2", "pain3"],
-  "decisionDrivers": ["driver1", "driver2", "driver3"],
-  "budgetRange": "Typical budget range or spending capacity"
-}
+Create a comprehensive ideal customer profile with:
+- Target industry segment
+- Company size (if B2B) or demographic segment (if B2C)
+- Key needs (at least 3)
+- Pain points (at least 3)
+- Decision drivers (at least 3)
+- Typical budget range or spending capacity
 
-Respond with ONLY the JSON object, no additional text.`;
+Focus on who would benefit most from this product/service.`;
 
-    const response = await model.invoke([new HumanMessage(prompt)]);
-    const customerProfile = formatJsonResponse(response.content.toString());
+    const customerProfile = await model.invoke(prompt);
+
+    console.log('Customer Profile:', customerProfile);
     
-    // Validate the response
-    const validatedProfile = CustomerProfileSchema.parse(customerProfile);
-    
-    return { customerProfile: validatedProfile };
+    return { customerProfile };
   } catch (error) {
+    console.error('Customer profile error:', error);
     return { 
       error: `Customer profile generation failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
     };
@@ -99,7 +90,7 @@ async function createUserPersonas(state: WorkflowState): Promise<Partial<Workflo
       throw new Error('Product and customer profiles are required');
     }
 
-    const model = getGeminiModel();
+    const model = getGeminiModel({ schema: PersonasArraySchema, jsonMode: true });
     const count = state.personaCount || 3;
     
     const prompt = `Based on the following product and customer profiles, create ${count} detailed user personas.
@@ -110,34 +101,25 @@ ${JSON.stringify(state.productProfile, null, 2)}
 Customer Profile:
 ${JSON.stringify(state.customerProfile, null, 2)}
 
-Create ${count} diverse user personas in JSON format as an array with the following structure for each persona:
-[
-  {
-    "name": "Persona Name (fictional)",
-    "ageRange": "Age range (e.g., 25-35)",
-    "demographic": "Demographic details (location, occupation, etc.)",
-    "goalsMotivations": ["goal1", "goal2", "goal3"],
-    "painPoints": ["pain1", "pain2", "pain3"],
-    "behaviorsPreferences": ["behavior1", "behavior2", "behavior3"],
-    "useCases": ["usecase1", "usecase2", "usecase3"],
-    "visualPreferences": {
-      "preferredColors": ["color1", "color2"],
-      "designStyle": "Preferred design style",
-      "layoutPreference": "Preferred layout style"
-    }
-  }
-]
+Create exactly ${count} diverse and realistic user personas. For each persona, provide:
+- A fictional name
+- Age range (e.g., 25-35)
+- Demographic details (location, occupation, etc.)
+- Goals and motivations (at least 3)
+- Pain points (at least 3)
+- Behaviors and preferences (at least 3)
+- Use cases (at least 3)
+- Visual preferences (preferred colors, design style, layout preference)
 
-Make each persona unique and realistic. Respond with ONLY the JSON array, no additional text.`;
+Make each persona unique, detailed, and grounded in the product/customer context.`;
 
-    const response = await model.invoke([new HumanMessage(prompt)]);
-    const personas = formatJsonResponse(response.content.toString());
+    const result = await model.invoke(prompt);
+
+    console.log('Personas:', result);
     
-    // Validate the response
-    const validatedPersonas = personas.map((p: any) => UserPersonaSchema.parse(p));
-    
-    return { personas: validatedPersonas };
+    return { personas: result.personas };
   } catch (error) {
+    console.error('Persona generation error:', error);
     return { 
       error: `Persona generation failed: ${error instanceof Error ? error.message : 'Unknown error'}` 
     };

@@ -41,6 +41,11 @@ export const UserPersonaSchema = z.object({
   }),
 });
 
+// Personas Array Schema for structured output
+export const PersonasArraySchema = z.object({
+  personas: z.array(UserPersonaSchema),
+});
+
 // Workflow State Schema
 export const WorkflowStateSchema = z.object({
   scrapedContent: z.string(),

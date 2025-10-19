@@ -1,42 +1,31 @@
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
-import { getEnv } from '@/lib/env';
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { getEnv } from "@/lib/env";
+import { z } from "zod";
 
-let modelInstance: ChatGoogleGenerativeAI | null = null;
+/**
+ * Returns a Gemini model instance.
+ * - Normal mode: for free-form text output.
+ * - JSON mode: for structured output using Zod schema validation.
+ */
+export function getGeminiModel<T extends z.ZodTypeAny>(
+  options?: { schema?: T; jsonMode?: boolean }
+) {
+  const env = getEnv();
 
-export function getGeminiModel() {
-  if (!modelInstance) {
-    const env = getEnv();
-    
-    modelInstance = new ChatGoogleGenerativeAI({
-      apiKey: env.GEMINI_API_KEY,
-      model: 'gemini-1.5-flash',
-      temperature: 0.7,
-      maxOutputTokens: 2048,
+  const baseModel = new ChatGoogleGenerativeAI({
+    apiKey: env.GEMINI_API_KEY,
+    model: "gemini-2.5-flash",
+    temperature: 0.7,
+    maxOutputTokens: 2048,
+  });
+
+  // If a schema is provided → return a structured-output model
+  if (options?.schema) {
+    return baseModel.withStructuredOutput(options.schema, {
+      method: options.jsonMode ? "json_mode" : "default",
     });
   }
-  
-  return modelInstance;
-}
 
-export function formatJsonResponse(text: string): any {
-  try {
-    // Try to extract JSON from markdown code blocks
-    const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[1]);
-    }
-    
-    // Try to extract JSON from the response
-    const jsonStart = text.indexOf('{');
-    const jsonEnd = text.lastIndexOf('}') + 1;
-    
-    if (jsonStart !== -1 && jsonEnd > jsonStart) {
-      return JSON.parse(text.slice(jsonStart, jsonEnd));
-    }
-    
-    // Try to parse the entire text
-    return JSON.parse(text);
-  } catch (error) {
-    throw new Error(`Failed to parse JSON response: ${error}`);
-  }
+  // Otherwise → return normal chat model
+  return baseModel;
 }
