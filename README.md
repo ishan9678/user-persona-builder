@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# User Persona Builder
+
+Transform any website into detailed user personas using AI-powered analysis.
+
+## Features
+
+- 🔍 **Web Scraping**: Extract content, semantics, and visual information from any website
+- 🤖 **AI-Powered Analysis**: Uses Google Gemini to create comprehensive profiles
+- 👥 **Multiple Personas**: Generate 1-5 unique user personas per website
+- 📊 **Transparent Process**: See real-time progress through each analysis stage
+- 🎨 **Modern UI**: Clean, minimalist design with subtle neo-brutalism aesthetics
+- 🏗️ **Modular Architecture**: Well-organized codebase with separation of concerns
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4 + shadcn/ui
+- **AI**: Google Gemini (via LangChain)
+- **Scraping**: Cheerio
+- **Validation**: Zod
+
+## Project Structure
+
+```
+user-persona-builder/
+├── app/                          # Next.js app directory
+│   ├── page.tsx                  # Main page component
+│   ├── layout.tsx                # Root layout
+│   └── globals.css               # Global styles
+├── modules/                      # Feature modules
+│   ├── scraper/                  # Web scraping module
+│   │   ├── types.ts              # Type definitions
+│   │   ├── scraper-utils.ts      # Scraping utilities
+│   │   └── actions.ts            # Server actions
+│   ├── persona-generator/        # AI persona generation
+│   │   ├── types.ts              # Type definitions
+│   │   ├── llm-utils.ts          # LLM utilities
+│   │   ├── workflow.ts           # Workflow orchestrator
+│   │   └── actions.ts            # Server actions
+│   └── landing/                  # Landing page components
+│       ├── types.ts              # Type definitions
+│       ├── url-input.tsx         # URL input component
+│       ├── intermediate-results.tsx  # Intermediate results display
+│       └── persona-results.tsx   # Final personas display
+├── components/ui/                # shadcn/ui components
+├── lib/                          # Shared utilities
+│   ├── env.ts                    # Environment validation
+│   └── utils.ts                  # Helper functions
+└── .env.local                    # Environment variables
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18+ installed
+- A Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. Copy `.env.example` to `.env.local` and add your Gemini API key:
+   ```bash
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usage
 
-## Deploy on Vercel
+1. Enter a website URL in the input field
+2. Adjust the number of personas (1-5) using the slider
+3. Click "Generate Personas"
+4. Watch the progress as the system:
+   - Scrapes the website content
+   - Creates a product profile
+   - Develops an ideal customer profile
+   - Generates detailed user personas
+5. View the results including:
+   - Product profile (features, value proposition, visual identity)
+   - Customer profile (needs, pain points, decision drivers)
+   - User personas (demographics, goals, behaviors, visual preferences)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Architecture
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Modular Design
+Each feature is organized into its own module with type definitions, business logic, server actions, and UI components (where applicable).
+
+### Server Actions
+All data fetching and AI operations use Next.js server actions for better type safety and simpler organization.
+
+### Workflow
+The persona generation uses a sequential workflow:
+1. **Product Profile Agent**: Analyzes website to create product profile
+2. **Customer Profile Agent**: Uses product profile to define ideal customer
+3. **Persona Generator Agent**: Creates diverse user personas based on previous profiles
+
+## License
+
+MIT
+
