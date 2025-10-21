@@ -1,3 +1,4 @@
+import { HumanMessage } from '@langchain/core/messages';
 import { getGeminiModel } from './model';
 import {
   ProductProfileSchema,
@@ -54,15 +55,35 @@ async function createCustomerProfile(state: WorkflowState): Promise<Partial<Work
 Product Profile:
 ${JSON.stringify(state.productProfile, null, 2)}
 
-Create a comprehensive ideal customer profile with:
-- Target industry segment
-- Company size (if B2B) or demographic segment (if B2C)
-- Key needs (at least 3)
-- Pain points (at least 3)
-- Decision drivers (at least 3)
-- Typical budget range or spending capacity
+First, determine if this is a B2B (business-to-business) or B2C (business-to-consumer) product/service.
 
-Focus on who would benefit most from this product/service.`;
+If B2B, provide:
+- type: "B2B"
+- industrySegment: Target industry sectors
+- companySize: Company size range (e.g., "50-500 employees", "Enterprise 1000+")
+- decisionMakers: Key decision makers and stakeholders
+- keyNeeds: Business needs (at least 3)
+- painPoints: Business pain points (at least 3)
+- useCases: Common business use cases (at least 3)
+- fitCriteria: What makes a company a good fit (at least 3)
+- exclusionCriteria: What disqualifies a company (at least 2)
+- budgetRange: Typical budget range
+- decisionDrivers: Key factors in purchase decision (at least 3)
+
+If B2C, provide:
+- type: "B2C"
+- ageRange: Target age range (e.g., "25-45")
+- incomeProfession: Income level and typical professions
+- lifestyle: Lifestyle characteristics and interests
+- keyNeeds: Personal needs and desires (at least 3)
+- painPoints: Personal pain points and frustrations (at least 3)
+- useCases: Common personal use cases (at least 3)
+- fitCriteria: What makes a person a good fit (at least 3)
+- exclusionCriteria: What disqualifies a person (at least 2)
+- budgetRange: Typical spending capacity
+- decisionDrivers: Key factors in purchase decision (at least 3)
+
+Focus on who would benefit most from this product/service and be specific about the ideal customer characteristics.`;
 
     const customerProfile = await model.invoke(prompt);
 
