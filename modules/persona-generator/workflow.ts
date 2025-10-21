@@ -1,15 +1,9 @@
-import { HumanMessage } from '@langchain/core/messages';
-import { getGeminiModel } from './llm-utils';
+import { getGeminiModel } from './model';
 import {
-  WorkflowStateSchema,
   ProductProfileSchema,
   CustomerProfileSchema,
-  UserPersonaSchema,
   PersonasArraySchema,
   type WorkflowState,
-  type ProductProfile,
-  type CustomerProfile,
-  type UserPersona,
 } from './types';
 
 // Node 1: Create Product Profile

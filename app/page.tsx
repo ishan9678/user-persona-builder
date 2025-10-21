@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { UrlInput } from '@/modules/landing/url-input';
 import { IntermediateResults } from '@/modules/landing/intermediate-results';
 import { PersonaResults } from '@/modules/landing/persona-results';
-import { scrapeUrl } from '@/modules/scraper/actions';
-import { generatePersonas } from '@/modules/persona-generator/actions';
+import { scrapeUrl } from '@/modules/scraper';
+import { generatePersonas } from '@/modules/persona-generator';
 import type { ProcessState } from '@/modules/landing/types';
 import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/persona-generator/types';
 
