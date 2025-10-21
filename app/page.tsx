@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { NavigationHeader } from '@/modules/landing/components/navigation-header';
-import { UrlInput } from '@/modules/landing/url-input';
-import { ProductProfileDisplay } from '@/modules/landing/product-profile-display';
-import { CustomerProfileDisplay } from '@/modules/landing/customer-profile-display';
-import { UserPersonasDisplay } from '@/modules/persona/user-personas-display';
-import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton } from '@/modules/landing/components/loading-skeleton';
-import { getStageConfig } from '@/modules/landing/config';
+import { NavigationHeader } from '@/modules/profiler/components/navigation-header';
+import { UrlInput } from '@/modules/profiler/url-input';
+import { ProductProfileCard } from '@/modules/profiler/product-profile-card';
+import { CustomerProfileCard } from '@/modules/profiler/customer-profile-card';
+import { UserPersonasDisplay } from '@/modules/profiler/persona/user-personas-display';
+import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton } from '@/modules/profiler/components/loading-skeleton';
+import { getStageConfig } from '@/modules/profiler/config';
 import { scrapeUrl } from '@/modules/scraper';
 import { generateProductProfile, generateCustomerProfile, generateUserPersonas } from '@/modules/llm';
-import type { ProcessState } from '@/modules/landing/types';
+import type { ProcessState } from '@/modules/profiler/types';
 import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/llm/types';
 
 export default function Home() {
@@ -140,7 +140,7 @@ export default function Home() {
         )}
         {productProfile && !loadingProduct && (
           <section id="product-profile" className="scroll-mt-20">
-            <ProductProfileDisplay productProfile={productProfile} />
+            <ProductProfileCard productProfile={productProfile} />
           </section>
         )}
 
@@ -152,7 +152,7 @@ export default function Home() {
         )}
         {customerProfile && !loadingCustomer && (
           <section id="customer-profile" className="scroll-mt-20">
-            <CustomerProfileDisplay customerProfile={customerProfile} />
+            <CustomerProfileCard customerProfile={customerProfile} />
           </section>
         )}
 

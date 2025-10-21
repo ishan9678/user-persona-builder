@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { X, Loader2, Trash2, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
-import { chatWithPersona } from '../llm/chat';
-import type { UserPersona, ProductProfile } from '../llm/types';
+import { chatWithPersona } from '../../llm/chat';
+import type { UserPersona, ProductProfile } from '../../llm/types';
 
 type PersonaChatModalProps = {
   persona: UserPersona;
