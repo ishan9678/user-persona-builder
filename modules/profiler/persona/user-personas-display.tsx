@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PersonaCard } from './persona-card';
 import { PersonaChatModal } from './persona-chat-modal';
 import { PersonaEditModal } from './persona-edit-modal';
@@ -23,6 +23,20 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   
   // Store chat messages for each persona by their name
   const [chatHistories, setChatHistories] = useState<Map<string, Array<{ role: 'user' | 'assistant'; content: string }>>>(new Map());
+
+  // Disable scroll when modals are open
+  useEffect(() => {
+    if (selectedPersona || editingPersona) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPersona, editingPersona]);
 
   const toggleCard = (index: number) => {
     setExpandedIndices(prev => toggleCardExpansion(prev, index));

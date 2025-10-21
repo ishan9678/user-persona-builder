@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { chatWithPersona } from '../../llm/chat';
 import type { UserPersona, ProductProfile } from '../../llm/types';
+import { handleChatExport } from './utils';
 
 type PersonaChatModalProps = {
   persona: UserPersona;
@@ -34,32 +35,7 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose, mes
     }
   };
 
-  const handleExportChat = () => {
-    // Create markdown content from chat messages
-    const markdown = `# Chat with ${persona.name}
 
-**Persona:** ${persona.name}  
-**Demographic:** ${persona.demographic}  
-**Date:** ${new Date().toLocaleDateString()}
-
----
-
-${messages.map((msg, idx) => {
-  const role = msg.role === 'user' ? '**You**' : `**${persona.name}**`;
-  return `### ${role}\n\n${msg.content}\n`;
-}).join('\n')}`;
-
-    // Download as markdown file
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `chat-${persona.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -98,11 +74,11 @@ ${messages.map((msg, idx) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto p-4"
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-2xl h-[600px] bg-background border-4 border-black dark:border-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] flex flex-col"
+        className="w-full max-w-2xl h-[600px] bg-background border-4 border-black dark:border-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] flex flex-col my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -117,7 +93,7 @@ ${messages.map((msg, idx) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleExportChat}
+                  onClick={() => handleChatExport(persona, messages)}
                   className="hover:bg-primary-foreground/20"
                   title="Export chat to markdown"
                 >

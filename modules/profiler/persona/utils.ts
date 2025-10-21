@@ -52,6 +52,39 @@ export function updatePersonaAtIndex(
 }
 
 /**
+ * Handles exporting chat history to a markdown file
+ */
+export function handleChatExport(
+  persona: UserPersona,
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+): void {
+  // Create markdown content from chat messages
+  const markdown = `# Chat with ${persona.name}
+
+**Persona:** ${persona.name}  
+**Demographic:** ${persona.demographic}  
+**Date:** ${new Date().toLocaleDateString()}
+
+---
+
+${messages.map((msg) => {
+    const role = msg.role === 'user' ? '**You**' : `**${persona.name}**`;
+    return `### ${role}\n\n${msg.content}\n`;
+  }).join('\n')}`;
+
+  // Download as markdown file
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `chat-${persona.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.md`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
  * Handles exporting a persona card in different formats
  */
 export async function handlePersonaExport(
