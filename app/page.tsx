@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { NavigationHeader } from '@/modules/profiler/components/navigation-header';
+import { LoadingSection } from '@/modules/profiler/components/loading-section';
 import { UrlInput } from '@/modules/profiler/url-input';
 import { ProductProfileCard } from '@/modules/profiler/product-profile-card';
 import { CustomerProfileCard } from '@/modules/profiler/customer-profile-card';
@@ -32,11 +33,6 @@ export default function Home() {
 
   const handleSubmit = async (url: string, personaCount: number) => {
     try {
-      setError(undefined);
-      setProductProfile(undefined);
-      setCustomerProfile(undefined);
-      setPersonas(undefined);
-
       // Step 1: Scrape URL
       const scrapingConfig = getStageConfig('scraping');
       setProcessState({
@@ -111,6 +107,10 @@ export default function Home() {
         message: errorConfig.message,
         progress: errorConfig.progress,
       });
+    } finally {
+      setLoadingProduct(false);
+      setLoadingCustomer(false);
+      setLoadingPersonas(false);
     }
   };
 
@@ -132,41 +132,34 @@ export default function Home() {
           </div>
         )}
 
-        {/* Product Profile Component */}
-        {loadingProduct && (
-          <section id="product-profile" className="scroll-mt-20">
-            <ProductProfileSkeleton />
-          </section>
-        )}
-        {productProfile && !loadingProduct && (
-          <section id="product-profile" className="scroll-mt-20">
-            <ProductProfileCard productProfile={productProfile} />
-          </section>
-        )}
+        {/* Product Profile */}
+        <LoadingSection
+          id="product-profile"
+          loading={loadingProduct}
+          fallback={<ProductProfileSkeleton />}>
+          {productProfile && <ProductProfileCard productProfile={productProfile} />}
+        </LoadingSection>
 
-        {/* Customer Profile Component */}
-        {loadingCustomer && (
-          <section id="customer-profile" className="scroll-mt-20">
-            <CustomerProfileSkeleton />
-          </section>
-        )}
-        {customerProfile && !loadingCustomer && (
-          <section id="customer-profile" className="scroll-mt-20">
-            <CustomerProfileCard customerProfile={customerProfile} />
-          </section>
-        )}
+        {/* Customer Profile */}
+        <LoadingSection
+          id="customer-profile"
+          loading={loadingCustomer}
+          fallback={<CustomerProfileSkeleton />}>
+          {customerProfile && <CustomerProfileCard customerProfile={customerProfile} />}
+        </LoadingSection>
 
-        {/* User Personas Component */}
-        {loadingPersonas && (
-          <section id="user-personas" className="scroll-mt-20">
-            <UserPersonasSkeleton />
-          </section>
-        )}
-        {personas && !loadingPersonas && (
-          <section id="user-personas" className="scroll-mt-20">
-            <UserPersonasDisplay personas={personas} productProfile={productProfile} />
-          </section>
-        )}
+        {/* User Personas */}
+        <LoadingSection
+          id="user-personas"
+          loading={loadingPersonas}
+          fallback={<UserPersonasSkeleton />}>
+          {personas && (
+            <UserPersonasDisplay
+              personas={personas}
+              productProfile={productProfile}
+            />
+          )}
+        </LoadingSection>
       </main>
 
       <footer className="border-t-2 border-black dark:border-white mt-20 py-8">
@@ -175,7 +168,7 @@ export default function Home() {
             User Persona Builder
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            Powered by Gemini AI
+            Powered by Gemini
           </p>
         </div>
       </footer>
