@@ -1,5 +1,4 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { getEnv } from "@/lib/env";
 import { z } from "zod";
 
 /**
@@ -10,10 +9,8 @@ import { z } from "zod";
 export function getGeminiModel<T extends z.ZodTypeAny>(
   options?: { schema?: T; jsonMode?: boolean }
 ) {
-  const env = getEnv();
-
   const baseModel = new ChatGoogleGenerativeAI({
-    apiKey: env.GEMINI_API_KEY,
+    apiKey: process.env.GEMINI_API_KEY,
     model: "gemini-2.5-flash",
     temperature: 0.7,
     maxOutputTokens: 4096,

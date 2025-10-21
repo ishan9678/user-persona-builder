@@ -6,7 +6,7 @@ import {
   extractSemanticElements,
   extractVisualInfo,
   extractTextContent,
-} from './scraper-utils';
+} from './utils';
 
 export async function scrapeUrl(url: string): Promise<ScrapedContent> {
   try {

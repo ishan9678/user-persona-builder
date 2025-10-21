@@ -4,16 +4,14 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { UserPersona } from '../persona-generator/types';
 
-type PersonaResultsProps = {
+type UserPersonasDisplayProps = {
   personas: UserPersona[];
 };
 
-export function PersonaResults({ personas }: PersonaResultsProps) {
-  if (!personas || personas.length === 0) return null;
-
+export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
-      <div className="text-center">
+    <div className="w-full max-w-6xl mx-auto">
+      <div className="text-center mb-8">
         <h2 className="text-3xl font-black uppercase tracking-tight mb-2">
           User Personas
         </h2>

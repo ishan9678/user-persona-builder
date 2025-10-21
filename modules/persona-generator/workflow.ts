@@ -1,38 +1,22 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { getGeminiModel } from './llm-utils';
+import { getGeminiModel } from './model';
 import {
-  WorkflowStateSchema,
   ProductProfileSchema,
   CustomerProfileSchema,
-  UserPersonaSchema,
   PersonasArraySchema,
   type WorkflowState,
-  type ProductProfile,
-  type CustomerProfile,
-  type UserPersona,
 } from './types';
+import {
+  getProductProfilePrompt,
+  getCustomerProfilePrompt,
+  getUserPersonasPrompt,
+} from './prompts';
 
 // Node 1: Create Product Profile
 async function createProductProfile(state: WorkflowState): Promise<Partial<WorkflowState>> {
   try {
     const model = getGeminiModel({ schema: ProductProfileSchema, jsonMode: true });
-    
-    const prompt = `Analyze the following website content and create a detailed product profile.
-
-Website Content:
-${state.scrapedContent}
-
-Create a comprehensive product profile with:
-- Product/Service name
-- Industry category
-- Key features (at least 3)
-- Main value proposition
-- Primary target market
-- Brand personality description
-- Visual identity (color scheme, typography, design style)
-
-Focus on extracting concrete information from the website content provided.`;
-
+    const prompt = getProductProfilePrompt(state.scrapedContent);
     const productProfile = await model.invoke(prompt);
 
     console.log('Product Profile:', productProfile);
@@ -54,22 +38,7 @@ async function createCustomerProfile(state: WorkflowState): Promise<Partial<Work
     }
 
     const model = getGeminiModel({ schema: CustomerProfileSchema, jsonMode: true });
-    
-    const prompt = `Based on the following product profile, create an ideal customer profile.
-
-Product Profile:
-${JSON.stringify(state.productProfile, null, 2)}
-
-Create a comprehensive ideal customer profile with:
-- Target industry segment
-- Company size (if B2B) or demographic segment (if B2C)
-- Key needs (at least 3)
-- Pain points (at least 3)
-- Decision drivers (at least 3)
-- Typical budget range or spending capacity
-
-Focus on who would benefit most from this product/service.`;
-
+    const prompt = getCustomerProfilePrompt(state.productProfile);
     const customerProfile = await model.invoke(prompt);
 
     console.log('Customer Profile:', customerProfile);
@@ -92,27 +61,7 @@ async function createUserPersonas(state: WorkflowState): Promise<Partial<Workflo
 
     const model = getGeminiModel({ schema: PersonasArraySchema, jsonMode: true });
     const count = state.personaCount || 3;
-    
-    const prompt = `Based on the following product and customer profiles, create ${count} detailed user personas.
-
-Product Profile:
-${JSON.stringify(state.productProfile, null, 2)}
-
-Customer Profile:
-${JSON.stringify(state.customerProfile, null, 2)}
-
-Create exactly ${count} diverse and realistic user personas. For each persona, provide:
-- A fictional name
-- Age range (e.g., 25-35)
-- Demographic details (location, occupation, etc.)
-- Goals and motivations (at least 3)
-- Pain points (at least 3)
-- Behaviors and preferences (at least 3)
-- Use cases (at least 3)
-- Visual preferences (preferred colors, design style, layout preference)
-
-Make each persona unique, detailed, and grounded in the product/customer context.`;
-
+    const prompt = getUserPersonasPrompt(state.productProfile, state.customerProfile, count);
     const result = await model.invoke(prompt);
 
     console.log('Personas:', result);

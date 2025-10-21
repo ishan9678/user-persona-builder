@@ -15,14 +15,28 @@ export const ProductProfileSchema = z.object({
   }),
 });
 
-// Customer Profile Schema
+// Customer Profile Schema - Supports both B2B and B2C
 export const CustomerProfileSchema = z.object({
-  industrySegment: z.string(),
-  companySize: z.string().optional(),
-  keyNeeds: z.array(z.string()),
-  painPoints: z.array(z.string()),
-  decisionDrivers: z.array(z.string()),
-  budgetRange: z.string().optional(),
+  type: z.enum(['B2B', 'B2C']).describe('Whether targeting businesses or consumers'),
+  
+  // B2B specific fields
+  industrySegment: z.string().optional().describe('Target industry for B2B'),
+  companySize: z.string().optional().describe('Company size range for B2B'),
+  decisionMakers: z.array(z.string()).optional().describe('Key decision makers in B2B'),
+  
+  // B2C specific fields
+  ageRange: z.string().optional().describe('Age range for B2C consumers'),
+  incomeProfession: z.string().optional().describe('Income level and profession for B2C'),
+  lifestyle: z.string().optional().describe('Lifestyle characteristics for B2C'),
+  
+  // Common fields for both B2B and B2C
+  keyNeeds: z.array(z.string()).describe('Primary needs and requirements'),
+  painPoints: z.array(z.string()).describe('Main pain points and challenges'),
+  useCases: z.array(z.string()).describe('Common use cases and scenarios'),
+  fitCriteria: z.array(z.string()).describe('Criteria that define a good fit'),
+  exclusionCriteria: z.array(z.string()).describe('Characteristics that exclude them'),
+  budgetRange: z.string().optional().describe('Typical budget or spending capacity'),
+  decisionDrivers: z.array(z.string()).describe('Key factors driving purchase decisions'),
 });
 
 // User Persona Schema
