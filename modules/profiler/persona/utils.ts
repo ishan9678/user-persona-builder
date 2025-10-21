@@ -60,7 +60,8 @@ export async function handlePersonaExport(
   index: number,
   cardRefs: Map<number, HTMLDivElement>,
   expandedIndices: Set<number>,
-  setExpandedIndices: (updater: (prev: Set<number>) => Set<number>) => void
+  setExpandedIndices: (updater: (prev: Set<number>) => Set<number>) => void,
+  setExportingIndex: (index: number | null) => void
 ): Promise<void> {
   const filename = `${persona.name.replace(/\s+/g, '-').toLowerCase()}-persona`;
   
@@ -68,6 +69,9 @@ export async function handlePersonaExport(
     exportToMarkdown(persona, filename);
     return;
   }
+
+  // Hide buttons during export
+  setExportingIndex(index);
 
   // For PNG and PDF, expand the card first to capture full details
   const wasExpanded = expandedIndices.has(index);

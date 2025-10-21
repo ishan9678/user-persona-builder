@@ -18,6 +18,7 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
   const [personasList, setPersonasList] = useState<UserPersona[]>(personas);
+  const [exportingIndex, setExportingIndex] = useState<number | null>(null);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   
   // Store chat messages for each persona by their name
@@ -38,7 +39,7 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   };
 
   const handleExport = async (persona: UserPersona, format: 'png' | 'pdf' | 'markdown', index: number) => {
-    await handlePersonaExport(persona, format, index, cardRefs.current, expandedIndices, setExpandedIndices);
+    await handlePersonaExport(persona, format, index, cardRefs.current, expandedIndices, setExpandedIndices, setExportingIndex);
   };
 
   return (
@@ -62,6 +63,7 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
               }}
               persona={persona}
               isExpanded={expandedIndices.has(idx)}
+              hideButtons={exportingIndex === idx}
               onToggle={() => toggleCard(idx)}
               onChatClick={() => setSelectedPersona(persona)}
               onEditClick={() => {

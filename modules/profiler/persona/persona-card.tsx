@@ -14,16 +14,18 @@ type PersonaCardProps = {
   onChatClick: () => void;
   onEditClick: () => void;
   onExport: (format: 'png' | 'pdf' | 'markdown') => void;
+  hideButtons?: boolean;
 };
 
 export const PersonaCard = forwardRef<HTMLDivElement, PersonaCardProps>(
-  function PersonaCard({ persona, isExpanded, onToggle, onChatClick, onEditClick, onExport }, ref) {
+  function PersonaCard({ persona, isExpanded, onToggle, onChatClick, onEditClick, onExport, hideButtons = false }, ref) {
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   return (
     <div ref={ref}>
       <Card className="p-6 border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all relative">
         {/* Export Button - Top Right (before edit) */}
+        {!hideButtons && (
         <div className="absolute top-4 right-14">
           <Button
             size="icon"
@@ -67,16 +69,19 @@ export const PersonaCard = forwardRef<HTMLDivElement, PersonaCardProps>(
             </div>
           )}
         </div>
+        )}
 
         {/* Edit Button - Top Right */}
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={onEditClick}
-          className="absolute top-4 right-4 rounded-full w-8 h-8 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-all"
-        >
-          <Pencil className="h-3 w-3" />
-        </Button>
+        {!hideButtons && (
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={onEditClick}
+            className="absolute top-4 right-4 rounded-full w-8 h-8 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-all"
+          >
+            <Pencil className="h-3 w-3" />
+          </Button>
+        )}
 
         <div className="space-y-4 pb-12">
           {/* Basic Info */}
@@ -179,23 +184,27 @@ export const PersonaCard = forwardRef<HTMLDivElement, PersonaCardProps>(
         </div>
 
         {/* Toggle Button - Bottom Left */}
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={onToggle}
-          className="absolute bottom-4 left-4 rounded-full w-10 h-10 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] transition-all"
-        >
-          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
+        {!hideButtons && (
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={onToggle}
+            className="absolute bottom-4 left-4 rounded-full w-10 h-10 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] transition-all"
+          >
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        )}
 
         {/* Chat Button - Bottom Right */}
-        <Button
-          size="icon"
-          onClick={onChatClick}
-          className="absolute bottom-4 right-4 rounded-full w-12 h-12 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] transition-all"
-        >
-          <MessageCircle className="h-5 w-5" />
-        </Button>
+        {!hideButtons && (
+          <Button
+            size="icon"
+            onClick={onChatClick}
+            className="absolute bottom-4 right-4 rounded-full w-12 h-12 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] transition-all"
+          >
+            <MessageCircle className="h-5 w-5" />
+          </Button>
+        )}
       </Card>
     </div>
   );
