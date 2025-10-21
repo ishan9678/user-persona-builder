@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PersonaCardCollapsed } from './persona-card-collapsed';
 import { PersonaCardExpanded } from './persona-card-expanded';
 import { PersonaChatModal } from './persona-chat-modal';
+import { PersonaEditModal } from './persona-edit-modal';
 import type { UserPersona } from '../persona-generator/types';
 
 type UserPersonasDisplayProps = {
@@ -12,18 +13,29 @@ type UserPersonasDisplayProps = {
 
 export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
   const [selectedPersona, setSelectedPersona] = useState<UserPersona | null>(null);
-  const [expandedPersonaNames, setExpandedPersonaNames] = useState<Set<string>>(new Set());
+  const [editingPersona, setEditingPersona] = useState<UserPersona | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
+  const [personasList, setPersonasList] = useState<UserPersona[]>(personas);
 
-  const toggleCard = (persona: UserPersona) => {
-    setExpandedPersonaNames(prev => {
+  const toggleCard = (index: number) => {
+    setExpandedIndices(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(persona.name)) {
-        newSet.delete(persona.name);
+      if (newSet.has(index)) {
+        newSet.delete(index);
       } else {
-        newSet.add(persona.name);
+        newSet.add(index);
       }
       return newSet;
     });
+  };
+
+  const handleSavePersona = (updatedPersona: UserPersona) => {
+    if (editingIndex !== null) {
+      setPersonasList(prev => 
+        prev.map((p, idx) => idx === editingIndex ? updatedPersona : p)
+      );
+    }
   };
 
   return (
@@ -34,27 +46,35 @@ export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
             User Personas
           </h2>
           <p className="text-muted-foreground">
-            {personas.length} detailed {personas.length === 1 ? 'persona' : 'personas'} generated
+            {personas.length} {personas.length === 1 ? 'persona' : 'personas'} generated
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
-          {personas.map((persona, idx) => {
-            const isExpanded = expandedPersonaNames.has(persona.name);
+          {personasList.map((persona, idx) => {
+            const isExpanded = expandedIndices.has(idx);
 
             return isExpanded ? (
               <PersonaCardExpanded
                 key={idx}
                 persona={persona}
-                onCollapse={() => toggleCard(persona)}
+                onCollapse={() => toggleCard(idx)}
                 onChatClick={() => setSelectedPersona(persona)}
+                onEditClick={() => {
+                  setEditingPersona(persona);
+                  setEditingIndex(idx);
+                }}
               />
             ) : (
               <PersonaCardCollapsed
                 key={idx}
                 persona={persona}
-                onExpand={() => toggleCard(persona)}
+                onExpand={() => toggleCard(idx)}
                 onChatClick={() => setSelectedPersona(persona)}
+                onEditClick={() => {
+                  setEditingPersona(persona);
+                  setEditingIndex(idx);
+                }}
               />
             );
           })}
@@ -67,6 +87,19 @@ export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
           persona={selectedPersona}
           isOpen={true}
           onClose={() => setSelectedPersona(null)}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {editingPersona && (
+        <PersonaEditModal
+          persona={editingPersona}
+          isOpen={true}
+          onClose={() => {
+            setEditingPersona(null);
+            setEditingIndex(null);
+          }}
+          onSave={handleSavePersona}
         />
       )}
     </>
