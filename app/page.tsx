@@ -138,7 +138,7 @@ export default function Home() {
         {/* User Personas Component */}
         {personas && (
           <section id="user-personas" className="scroll-mt-20">
-            <UserPersonasDisplay personas={personas} />
+            <UserPersonasDisplay personas={personas} productProfile={productProfile} />
           </section>
         )}
       </main>

@@ -48,7 +48,7 @@ export function ProductProfileDisplay({ productProfile }: ProductProfileDisplayP
               {productProfile.keyFeatures.map((feature, idx) => (
                 <Badge 
                   key={idx} 
-                  className="border-2 border-black dark:border-white font-medium"
+                  className="border-2 border-black dark:border-white font-medium max-w-full break-words whitespace-normal"
                 >
                   {feature}
                 </Badge>

@@ -5,16 +5,17 @@ import { X, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { chatWithPersona } from '../persona-generator/chat-actions';
-import type { UserPersona } from '../persona-generator/types';
+import type { UserPersona, ProductProfile } from '../persona-generator/types';
 
 type PersonaChatModalProps = {
   persona: UserPersona;
+  productProfile?: ProductProfile;
   isOpen: boolean;
   onClose: () => void;
 };
 
 
-export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalProps) {
+export function PersonaChatModal({ persona, productProfile, isOpen, onClose }: PersonaChatModalProps) {
 
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     {
@@ -38,7 +39,7 @@ export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalP
 
     try {
       // Get response from Gemini via server action
-      const result = await chatWithPersona(persona, userMessage, messages);
+      const result = await chatWithPersona(persona, productProfile, userMessage, messages);
       
       if (result.success) {
         setMessages(prev => [...prev, { 

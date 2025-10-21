@@ -93,7 +93,19 @@ Make each persona unique, detailed, and grounded in the product/customer context
 /**
  * Prompt for persona chat roleplay context
  */
-export function getPersonaChatContext(persona: UserPersona): string {
+export function getPersonaChatContext(persona: UserPersona, productProfile?: ProductProfile): string {
+  const productContext = productProfile ? `
+
+You are discussing and providing feedback about the following product:
+Product Name: ${productProfile.name}
+Category: ${productProfile.category}
+Value Proposition: ${productProfile.valueProposition}
+Key Features: ${productProfile.keyFeatures.join(', ')}
+Target Market: ${productProfile.targetMarket}
+Brand Personality: ${productProfile.brandPersonality}
+
+When answering questions, consider how this product relates to your needs, goals, and pain points. Provide authentic feedback from your perspective as ${persona.name}.` : '';
+
   return `You are roleplaying as ${persona.name}, a user persona with the following characteristics:
 
 Demographics: ${persona.demographic}
@@ -114,7 +126,7 @@ ${persona.useCases.map(u => `- ${u}`).join('\n')}
 Visual Preferences:
 - Preferred Colors: ${persona.visualPreferences.preferredColors.join(', ')}
 - Design Style: ${persona.visualPreferences.designStyle}
-- Layout Preference: ${persona.visualPreferences.layoutPreference}
+- Layout Preference: ${persona.visualPreferences.layoutPreference}${productContext}
 
 Respond as this persona would, incorporating their goals, pain points, and preferences into your answers. Be conversational, authentic, and speak from their perspective. Keep responses concise and natural.`;
 }

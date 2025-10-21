@@ -6,13 +6,14 @@ import { PersonaCardExpanded } from './persona-card-expanded';
 import { PersonaChatModal } from './persona-chat-modal';
 import { PersonaEditModal } from './persona-edit-modal';
 import { exportToPng, exportToPdf, exportToMarkdown } from '@/lib/export-utils';
-import type { UserPersona } from '../persona-generator/types';
+import type { UserPersona, ProductProfile } from '../persona-generator/types';
 
 type UserPersonasDisplayProps = {
   personas: UserPersona[];
+  productProfile?: ProductProfile;
 };
 
-export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
+export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDisplayProps) {
   const [selectedPersona, setSelectedPersona] = useState<UserPersona | null>(null);
   const [editingPersona, setEditingPersona] = useState<UserPersona | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -154,6 +155,7 @@ export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
       {selectedPersona && (
         <PersonaChatModal
           persona={selectedPersona}
+          productProfile={productProfile}
           isOpen={true}
           onClose={() => setSelectedPersona(null)}
         />
