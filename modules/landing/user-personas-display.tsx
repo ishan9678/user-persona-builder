@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { MessageCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PersonaChatModal } from './persona-chat-modal';
 import type { UserPersona } from '../persona-generator/types';
 
 type UserPersonasDisplayProps = {
@@ -9,8 +13,11 @@ type UserPersonasDisplayProps = {
 };
 
 export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
+  const [selectedPersona, setSelectedPersona] = useState<UserPersona | null>(null);
+
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <>
+      <div className="w-full max-w-6xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-black uppercase tracking-tight mb-2">
           User Personas
@@ -24,7 +31,7 @@ export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
         {personas.map((persona, idx) => (
           <Card 
             key={idx}
-            className="p-6 border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all"
+            className="p-6 border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all relative"
           >
             <div className="space-y-4">
               <div>
@@ -118,9 +125,28 @@ export function UserPersonasDisplay({ personas }: UserPersonasDisplayProps) {
                 </div>
               </div>
             </div>
+
+            {/* Chat Button - Bottom Right */}
+            <Button
+              size="icon"
+              onClick={() => setSelectedPersona(persona)}
+              className="absolute bottom-4 right-4 rounded-full w-12 h-12 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] transition-all"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </Button>
           </Card>
         ))}
       </div>
     </div>
+
+    {/* Chat Modal */}
+    {selectedPersona && (
+      <PersonaChatModal
+        persona={selectedPersona}
+        isOpen={true}
+        onClose={() => setSelectedPersona(null)}
+      />
+    )}
+  </>
   );
 }

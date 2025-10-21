@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@assistant-ui/react": "^0.11.32",
     "@langchain/google-genai": "^1.0.0",
     "@langchain/langgraph": "^1.0.0",
     "@radix-ui/react-progress": "^1.1.7",
