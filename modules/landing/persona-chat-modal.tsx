@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { chatWithPersona } from '../persona-generator/chat-actions';
 import type { UserPersona } from '../persona-generator/types';
 
 type PersonaChatModalProps = {
@@ -14,8 +15,6 @@ type PersonaChatModalProps = {
 
 export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalProps) {
 
-    console.log('PersonaChatModal rendered with persona:', persona);
-
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     {
       role: 'assistant',
@@ -23,24 +22,43 @@ export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalP
     }
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
-    // Add user message
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
-    
-    // Simulate assistant response (you can integrate with real AI later)
-    setTimeout(() => {
+    const userMessage = input;
+    // Add user message immediately
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      // Get response from Gemini via server action
+      const result = await chatWithPersona(persona, userMessage, messages);
+      
+      if (result.success) {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: result.message 
+        }]);
+      } else {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: 'Sorry, I encountered an error. Please try again.' 
+        }]);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: `As someone who ${persona.goalsMotivations[0].toLowerCase()}, I think that's an interesting question. Let me think about it from my perspective...` 
+        content: 'Sorry, I encountered an error. Please try again.' 
       }]);
-    }, 1000);
-
-    setInput('');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,6 +104,19 @@ export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalP
               </div>
             </div>
           ))}
+          
+          {/* Typing Indicator */}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted p-3 rounded-lg">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input */}
@@ -95,15 +126,24 @@ export function PersonaChatModal({ persona, isOpen, onClose }: PersonaChatModalP
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSend()}
               placeholder={`Ask ${persona.name} anything...`}
-              className="flex-1 px-4 py-2 border-2 border-black dark:border-white bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 border-2 border-black dark:border-white bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <Button
               onClick={handleSend}
+              disabled={isLoading}
               className="border-2 border-black dark:border-white font-bold uppercase"
             >
-              Send
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Sending
+                </>
+              ) : (
+                'Send'
+              )}
             </Button>
           </div>
         </div>
