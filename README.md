@@ -40,9 +40,11 @@ user-persona-builder/
 │   │   └── actions.ts            # Server actions
 │   └── landing/                  # Landing page components
 │       ├── types.ts              # Type definitions
+│       ├── config.ts             # Stage configuration mapping
 │       ├── url-input.tsx         # URL input component
-│       ├── intermediate-results.tsx  # Intermediate results display
-│       └── persona-results.tsx   # Final personas display
+│       ├── product-profile-display.tsx    # Product profile display
+│       ├── customer-profile-display.tsx   # Customer profile display
+│       └── user-personas-display.tsx      # User personas display
 ├── components/ui/                # shadcn/ui components
 ├── lib/                          # Shared utilities
 │   ├── env.ts                    # Environment validation
