@@ -9,11 +9,9 @@ import {
   type CustomerProfile,
   type UserPersona,
 } from './types';
-import {
-  getProductProfilePrompt,
-  getCustomerProfilePrompt,
-  getUserPersonasPrompt,
-} from './prompts';
+import { getProductProfilePrompt } from './prompts/product-profile';
+import { getCustomerProfilePrompt } from './prompts/customer-profile';
+import { getUserPersonasPrompt } from './prompts/persona';
 
 export async function generateProductProfile(
   scrapedContent: string

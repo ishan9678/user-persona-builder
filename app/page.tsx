@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { NavigationHeader } from '@/modules/landing/navigation-header';
+import { NavigationHeader } from '@/modules/landing/components/navigation-header';
 import { UrlInput } from '@/modules/landing/url-input';
 import { ProductProfileDisplay } from '@/modules/landing/product-profile-display';
 import { CustomerProfileDisplay } from '@/modules/landing/customer-profile-display';
-import { UserPersonasDisplay } from '@/modules/landing/user-personas-display';
-import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton } from '@/modules/landing/loading-skeleton';
+import { UserPersonasDisplay } from '@/modules/persona/user-personas-display';
+import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton } from '@/modules/landing/components/loading-skeleton';
 import { getStageConfig } from '@/modules/landing/config';
 import { scrapeUrl } from '@/modules/scraper';
-import { generateProductProfile, generateCustomerProfile, generateUserPersonas } from '@/modules/persona-generator';
+import { generateProductProfile, generateCustomerProfile, generateUserPersonas } from '@/modules/llm';
 import type { ProcessState } from '@/modules/landing/types';
-import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/persona-generator/types';
+import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/llm/types';
 
 export default function Home() {
   const [processState, setProcessState] = useState<ProcessState>({

@@ -2,7 +2,7 @@
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { CustomerProfile } from '../persona-generator/types';
+import type { CustomerProfile } from '../llm/types';
 
 type CustomerProfileDisplayProps = {
   customerProfile: CustomerProfile;

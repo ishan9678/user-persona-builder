@@ -5,7 +5,7 @@ import { MessageCircle, ChevronUp, Pencil, Download } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { UserPersona } from '../persona-generator/types';
+import type { UserPersona } from '../llm/types';
 
 type PersonaCardExpandedProps = {
   persona: UserPersona;

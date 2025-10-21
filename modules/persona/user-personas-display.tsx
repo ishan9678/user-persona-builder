@@ -6,7 +6,7 @@ import { PersonaCardExpanded } from './persona-card-expanded';
 import { PersonaChatModal } from './persona-chat-modal';
 import { PersonaEditModal } from './persona-edit-modal';
 import { exportToPng, exportToPdf, exportToMarkdown } from '@/lib/export-utils';
-import type { UserPersona, ProductProfile } from '../persona-generator/types';
+import type { UserPersona, ProductProfile } from '../llm/types';
 
 type UserPersonasDisplayProps = {
   personas: UserPersona[];
