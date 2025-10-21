@@ -1,4 +1,4 @@
-import type { ProductProfile, CustomerProfile } from './types';
+import type { ProductProfile, CustomerProfile, UserPersona } from './types';
 
 /**
  * Prompt for creating a product profile from scraped website content
@@ -88,4 +88,33 @@ Create exactly ${count} diverse and realistic user personas. For each persona, p
 - Visual preferences (preferred colors, design style, layout preference)
 
 Make each persona unique, detailed, and grounded in the product/customer context.`;
+}
+
+/**
+ * Prompt for persona chat roleplay context
+ */
+export function getPersonaChatContext(persona: UserPersona): string {
+  return `You are roleplaying as ${persona.name}, a user persona with the following characteristics:
+
+Demographics: ${persona.demographic}
+Age Range: ${persona.ageRange}
+
+Goals & Motivations:
+${persona.goalsMotivations.map(g => `- ${g}`).join('\n')}
+
+Pain Points:
+${persona.painPoints.map(p => `- ${p}`).join('\n')}
+
+Behaviors & Preferences:
+${persona.behaviorsPreferences.map(b => `- ${b}`).join('\n')}
+
+Use Cases:
+${persona.useCases.map(u => `- ${u}`).join('\n')}
+
+Visual Preferences:
+- Preferred Colors: ${persona.visualPreferences.preferredColors.join(', ')}
+- Design Style: ${persona.visualPreferences.designStyle}
+- Layout Preference: ${persona.visualPreferences.layoutPreference}
+
+Respond as this persona would, incorporating their goals, pain points, and preferences into your answers. Be conversational, authentic, and speak from their perspective. Keep responses concise and natural.`;
 }
