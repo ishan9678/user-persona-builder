@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { PersonaCard } from './persona-card';
 import { PersonaChatModal } from './persona-chat-modal';
 import { PersonaEditModal } from './persona-edit-modal';
-import { exportToPng, exportToPdf, exportToMarkdown } from '@/lib/export-utils';
+import { getChatHistory, updateChatHistory, toggleCardExpansion, updatePersonaAtIndex, handlePersonaExport } from './utils';
 import type { UserPersona, ProductProfile } from '../../llm/types';
 
 type UserPersonasDisplayProps = {
@@ -24,101 +24,21 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   const [chatHistories, setChatHistories] = useState<Map<string, Array<{ role: 'user' | 'assistant'; content: string }>>>(new Map());
 
   const toggleCard = (index: number) => {
-    setExpandedIndices(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
-      }
-      return newSet;
-    });
+    setExpandedIndices(prev => toggleCardExpansion(prev, index));
   };
 
   const handleSavePersona = (updatedPersona: UserPersona) => {
     if (editingIndex !== null) {
-      setPersonasList(prev => 
-        prev.map((p, idx) => idx === editingIndex ? updatedPersona : p)
-      );
+      setPersonasList(prev => updatePersonaAtIndex(prev, editingIndex, updatedPersona));
     }
   };
 
-  const getInitialMessages = (persona: UserPersona) => [
-    {
-      role: 'assistant' as const,
-      content: `Hi! I'm ${persona.name}, ${persona.demographic}. I'm here to help you understand my perspective as a user persona. Feel free to ask me anything about my needs, goals, or how I'd use your product!`
-    }
-  ];
-
-  const getChatHistory = (persona: UserPersona) => {
-    return chatHistories.get(persona.name) || getInitialMessages(persona);
-  };
-
-  const updateChatHistory = (persona: UserPersona, messages: Array<{ role: 'user' | 'assistant'; content: string }>) => {
-    setChatHistories(prev => {
-      const newMap = new Map(prev);
-      newMap.set(persona.name, messages);
-      return newMap;
-    });
+  const handleUpdateChatHistory = (persona: UserPersona, messages: Array<{ role: 'user' | 'assistant'; content: string }>) => {
+    setChatHistories(prev => updateChatHistory(prev, persona, messages));
   };
 
   const handleExport = async (persona: UserPersona, format: 'png' | 'pdf' | 'markdown', index: number) => {
-    const filename = `${persona.name.replace(/\s+/g, '-').toLowerCase()}-persona`;
-    
-    if (format === 'markdown') {
-      exportToMarkdown(persona, filename);
-      return;
-    }
-
-    // For PNG and PDF, expand the card first to capture full details
-    const wasExpanded = expandedIndices.has(index);
-    
-    if (!wasExpanded) {
-      // Expand the card
-      setExpandedIndices(prev => {
-        const newSet = new Set(prev);
-        newSet.add(index);
-        return newSet;
-      });
-      
-      // Wait for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Get the expanded card element
-    const cardElement = cardRefs.current.get(index);
-    if (!cardElement) {
-      alert('Unable to export: Card element not found');
-      // Collapse back if it wasn't expanded
-      if (!wasExpanded) {
-        setExpandedIndices(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(index);
-          return newSet;
-        });
-      }
-      return;
-    }
-
-    try {
-      if (format === 'png') {
-        await exportToPng(cardElement, filename);
-      } else if (format === 'pdf') {
-        await exportToPdf(cardElement, filename);
-      }
-    } catch (error) {
-      console.error('Export error:', error);
-      alert(`Failed to export as ${format.toUpperCase()}. Please try again.`);
-    } finally {
-      // Collapse back if it wasn't originally expanded
-      if (!wasExpanded) {
-        setExpandedIndices(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(index);
-          return newSet;
-        });
-      }
-    }
+    await handlePersonaExport(persona, format, index, cardRefs.current, expandedIndices, setExpandedIndices);
   };
 
   return (
@@ -161,8 +81,8 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
           productProfile={productProfile}
           isOpen={true}
           onClose={() => setSelectedPersona(null)}
-          messages={getChatHistory(selectedPersona)}
-          onMessagesChange={(messages) => updateChatHistory(selectedPersona, messages)}
+          messages={getChatHistory(chatHistories, selectedPersona)}
+          onMessagesChange={(messages) => handleUpdateChatHistory(selectedPersona, messages)}
         />
       )}
 
