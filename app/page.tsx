@@ -6,9 +6,10 @@ import { UrlInput } from '@/modules/landing/url-input';
 import { ProductProfileDisplay } from '@/modules/landing/product-profile-display';
 import { CustomerProfileDisplay } from '@/modules/landing/customer-profile-display';
 import { UserPersonasDisplay } from '@/modules/landing/user-personas-display';
+import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton } from '@/modules/landing/loading-skeleton';
 import { getStageConfig } from '@/modules/landing/config';
 import { scrapeUrl } from '@/modules/scraper';
-import { generatePersonas } from '@/modules/persona-generator';
+import { generateProductProfile, generateCustomerProfile, generateUserPersonas } from '@/modules/persona-generator';
 import type { ProcessState } from '@/modules/landing/types';
 import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/persona-generator/types';
 
@@ -23,6 +24,11 @@ export default function Home() {
   const [customerProfile, setCustomerProfile] = useState<CustomerProfile>();
   const [personas, setPersonas] = useState<UserPersona[]>();
   const [error, setError] = useState<string>();
+  
+  // Loading states for each section
+  const [loadingProduct, setLoadingProduct] = useState(false);
+  const [loadingCustomer, setLoadingCustomer] = useState(false);
+  const [loadingPersonas, setLoadingPersonas] = useState(false);
 
   const handleSubmit = async (url: string, personaCount: number) => {
     try {
@@ -40,59 +46,64 @@ export default function Home() {
       });
 
       const scrapedContent = await scrapeUrl(url);
+      const contentString = JSON.stringify(scrapedContent, null, 2);
 
-      // Step 2: Generate product profile
+      // Step 2: Generate Product Profile
       const productConfig = getStageConfig('product-profile');
       setProcessState({
         stage: 'product-profile',
         message: productConfig.message,
         progress: productConfig.progress,
       });
+      setLoadingProduct(true);
 
-      // Prepare scraped content as JSON string
-      const contentString = JSON.stringify(scrapedContent, null, 2);
+      const productProfileResult = await generateProductProfile(contentString);
+      setProductProfile(productProfileResult);
+      setLoadingProduct(false);
 
-      // Generate all profiles and personas
-      const result = await generatePersonas(contentString, personaCount);
+      // Step 3: Generate Customer Profile
+      const customerConfig = getStageConfig('customer-profile');
+      setProcessState({
+        stage: 'customer-profile',
+        message: customerConfig.message,
+        progress: customerConfig.progress,
+      });
+      setLoadingCustomer(true);
 
-      // Update UI with product profile
-      if (result.productProfile) {
-        setProductProfile(result.productProfile);
-        
-        const customerConfig = getStageConfig('customer-profile');
-        setProcessState({
-          stage: 'customer-profile',
-          message: customerConfig.message,
-          progress: customerConfig.progress,
-        });
-      }
+      const customerProfileResult = await generateCustomerProfile(productProfileResult);
+      setCustomerProfile(customerProfileResult);
+      setLoadingCustomer(false);
 
-      // Update UI with customer profile
-      if (result.customerProfile) {
-        setCustomerProfile(result.customerProfile);
-        
-        const personasConfig = getStageConfig('generating-personas');
-        setProcessState({
-          stage: 'generating-personas',
-          message: personasConfig.message,
-          progress: personasConfig.progress,
-        });
-      }
+      // Step 4: Generate User Personas
+      const personasConfig = getStageConfig('generating-personas');
+      setProcessState({
+        stage: 'generating-personas',
+        message: personasConfig.message,
+        progress: personasConfig.progress,
+      });
+      setLoadingPersonas(true);
 
-      // Update UI with personas
-      if (result.personas) {
-        setPersonas(result.personas);
-        
-        const completeConfig = getStageConfig('complete');
-        setProcessState({
-          stage: 'complete',
-          message: completeConfig.message,
-          progress: completeConfig.progress,
-        });
-      }
+      const personasResult = await generateUserPersonas(
+        productProfileResult,
+        customerProfileResult,
+        personaCount
+      );
+      setPersonas(personasResult);
+      setLoadingPersonas(false);
+
+      // Complete
+      const completeConfig = getStageConfig('complete');
+      setProcessState({
+        stage: 'complete',
+        message: completeConfig.message,
+        progress: completeConfig.progress,
+      });
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setLoadingProduct(false);
+      setLoadingCustomer(false);
+      setLoadingPersonas(false);
       
       const errorConfig = getStageConfig('error');
       setProcessState({
@@ -103,7 +114,7 @@ export default function Home() {
     }
   };
 
-  const hasResults = !!(productProfile || customerProfile || personas);
+  const hasResults = !!(productProfile || customerProfile || personas || loadingProduct || loadingCustomer || loadingPersonas);
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,21 +133,36 @@ export default function Home() {
         )}
 
         {/* Product Profile Component */}
-        {productProfile && (
+        {loadingProduct && (
+          <section id="product-profile" className="scroll-mt-20">
+            <ProductProfileSkeleton />
+          </section>
+        )}
+        {productProfile && !loadingProduct && (
           <section id="product-profile" className="scroll-mt-20">
             <ProductProfileDisplay productProfile={productProfile} />
           </section>
         )}
 
         {/* Customer Profile Component */}
-        {customerProfile && (
+        {loadingCustomer && (
+          <section id="customer-profile" className="scroll-mt-20">
+            <CustomerProfileSkeleton />
+          </section>
+        )}
+        {customerProfile && !loadingCustomer && (
           <section id="customer-profile" className="scroll-mt-20">
             <CustomerProfileDisplay customerProfile={customerProfile} />
           </section>
         )}
 
         {/* User Personas Component */}
-        {personas && (
+        {loadingPersonas && (
+          <section id="user-personas" className="scroll-mt-20">
+            <UserPersonasSkeleton />
+          </section>
+        )}
+        {personas && !loadingPersonas && (
           <section id="user-personas" className="scroll-mt-20">
             <UserPersonasDisplay personas={personas} productProfile={productProfile} />
           </section>
