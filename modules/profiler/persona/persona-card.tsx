@@ -23,7 +23,7 @@ export const PersonaCard = forwardRef<HTMLDivElement, PersonaCardProps>(
 
   return (
     <div ref={ref}>
-      <Card className="p-6 border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all relative">
+      <Card className={`p-6 border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all relative ${!isExpanded ? 'h-[280px] w-[380px]' : ''}`}>
         {/* Export Button - Top Right (before edit) */}
         {!hideButtons && (
         <div className="absolute top-4 right-14">

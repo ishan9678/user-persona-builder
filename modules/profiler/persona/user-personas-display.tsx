@@ -24,6 +24,13 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   // Store chat messages for each persona by their name
   const [chatHistories, setChatHistories] = useState<Map<string, Array<{ role: 'user' | 'assistant'; content: string }>>>(new Map());
 
+  // Sync personasList with personas prop when it changes (e.g., when switching reports)
+  useEffect(() => {
+    setPersonasList(personas);
+    setExpandedIndices(new Set()); // Reset expanded states when switching reports
+    setChatHistories(new Map()); // Clear chat histories when switching reports
+  }, [personas]);
+
   // Disable scroll when modals are open
   useEffect(() => {
     if (selectedPersona || editingPersona) {
@@ -58,7 +65,7 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
 
   return (
     <>
-      <div className="w-full max-w-6xl mx-auto">
+      <div className="w-full max-w-[76rem] mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-black uppercase tracking-tight mb-2">
             User Personas
@@ -68,7 +75,7 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto justify-items-center">
           {personasList.map((persona, idx) => (
             <PersonaCard
               key={idx}
