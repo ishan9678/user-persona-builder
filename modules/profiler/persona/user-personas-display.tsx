@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { PersonaCardCollapsed } from './persona-card-collapsed';
-import { PersonaCardExpanded } from './persona-card-expanded';
+import { PersonaCard } from './persona-card';
 import { PersonaChatModal } from './persona-chat-modal';
 import { PersonaEditModal } from './persona-edit-modal';
 import { exportToPng, exportToPdf, exportToMarkdown } from '@/lib/export-utils';
@@ -135,41 +134,23 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
-          {personasList.map((persona, idx) => {
-            const isExpanded = expandedIndices.has(idx);
-
-            return isExpanded ? (
-              <PersonaCardExpanded
-                key={idx}
-                ref={(el) => {
-                  if (el) cardRefs.current.set(idx, el);
-                }}
-                persona={persona}
-                onCollapse={() => toggleCard(idx)}
-                onChatClick={() => setSelectedPersona(persona)}
-                onEditClick={() => {
-                  setEditingPersona(persona);
-                  setEditingIndex(idx);
-                }}
-                onExport={(format) => handleExport(persona, format, idx)}
-              />
-            ) : (
-              <PersonaCardCollapsed
-                key={idx}
-                ref={(el) => {
-                  if (el) cardRefs.current.set(idx, el);
-                }}
-                persona={persona}
-                onExpand={() => toggleCard(idx)}
-                onChatClick={() => setSelectedPersona(persona)}
-                onEditClick={() => {
-                  setEditingPersona(persona);
-                  setEditingIndex(idx);
-                }}
-                onExport={(format) => handleExport(persona, format, idx)}
-              />
-            );
-          })}
+          {personasList.map((persona, idx) => (
+            <PersonaCard
+              key={idx}
+              ref={(el: HTMLDivElement | null) => {
+                if (el) cardRefs.current.set(idx, el);
+              }}
+              persona={persona}
+              isExpanded={expandedIndices.has(idx)}
+              onToggle={() => toggleCard(idx)}
+              onChatClick={() => setSelectedPersona(persona)}
+              onEditClick={() => {
+                setEditingPersona(persona);
+                setEditingIndex(idx);
+              }}
+              onExport={(format: 'png' | 'pdf' | 'markdown') => handleExport(persona, format, idx)}
+            />
+          ))}
         </div>
       </div>
 
