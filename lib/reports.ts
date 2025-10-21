@@ -1,7 +1,26 @@
-import type { ReportEntry, ReportStorage } from '../types/report';
+import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/llm/types';
 
+// Types
+export type ReportEntry = {
+  id: string;
+  url: string;
+  timestamp: number;
+  reportData: {
+    productProfile: ProductProfile;
+    customerProfile: CustomerProfile;
+    userPersonas: UserPersona[];
+  };
+};
+
+export type ReportStorage = {
+  reports: ReportEntry[];
+};
+
+// Constants
 const STORAGE_KEY = 'user-persona-reports';
 const MAX_REPORTS = 10; // Keep only the last 10 reports
+
+// Helper Functions
 
 /**
  * Get all reports from localStorage

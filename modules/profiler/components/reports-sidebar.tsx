@@ -1,8 +1,8 @@
 'use client';
 
-import { FileText, Trash2, Calendar, ExternalLink, X } from 'lucide-react';
+import { Trash2, Calendar, ExternalLink, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { ReportEntry } from '../types/report';
+import type { ReportEntry } from '@/lib/reports';
 
 type ReportsSidebarProps = {
   reports: ReportEntry[];

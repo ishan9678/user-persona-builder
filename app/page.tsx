@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { NavigationHeader } from '@/modules/profiler/components/navigation-header';
 import { ReportsSidebar } from '@/modules/profiler/components/reports-sidebar';
 import { LoadingSection } from '@/modules/profiler/components/loading-section';
-import { UrlInput } from '@/modules/profiler/url-input';
+import { UrlInput } from '@/modules/profiler/components/url-input';
 import { ProductProfileCard } from '@/modules/profiler/product-profile-card';
 import { CustomerProfileCard } from '@/modules/profiler/customer-profile-card';
 import { UserPersonasDisplay } from '@/modules/profiler/persona/user-personas-display';
@@ -12,10 +12,10 @@ import { ProductProfileSkeleton, CustomerProfileSkeleton, UserPersonasSkeleton }
 import { getStageConfig } from '@/modules/profiler/config';
 import { scrapeUrl } from '@/modules/scraper';
 import { generateProductProfile, generateCustomerProfile, generateUserPersonas } from '@/modules/llm';
-import { getReports, saveReport, deleteReport } from '@/modules/profiler/utils/local-storage';
+import { getReports, saveReport, deleteReport } from '@/lib/reports';
 import type { ProcessState } from '@/modules/profiler/types';
 import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/llm/types';
-import type { ReportEntry } from '@/modules/profiler/types/report';
+import type { ReportEntry } from '@/lib/reports';
 
 export default function Home() {
   const [processState, setProcessState] = useState<ProcessState>({
@@ -50,6 +50,10 @@ export default function Home() {
     try {
       setCurrentUrl(url);
       setError(undefined);
+      setProductProfile(undefined);
+      setCustomerProfile(undefined);
+      setPersonas(undefined);
+      setCurrentReportId(undefined);
       
       // Step 1: Scrape URL
       const scrapingConfig = getStageConfig('scraping');
