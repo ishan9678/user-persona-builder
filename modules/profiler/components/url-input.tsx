@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import type { ProcessState } from './types';
+import type { ProcessState } from '../types';
 
 type UrlInputProps = {
   onSubmit: (url: string, personaCount: number) => void;

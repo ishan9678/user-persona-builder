@@ -1,3 +1,5 @@
+import type { ProductProfile, CustomerProfile, UserPersona } from '@/modules/llm/types';
+
 export type ProcessStage = 
   | 'idle'
   | 'scraping'

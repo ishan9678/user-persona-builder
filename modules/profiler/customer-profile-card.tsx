@@ -2,13 +2,13 @@
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { CustomerProfile } from '../persona-generator/types';
+import type { CustomerProfile } from '../llm/types';
 
-type CustomerProfileDisplayProps = {
+type CustomerProfileCardProps = {
   customerProfile: CustomerProfile;
 };
 
-export function CustomerProfileDisplay({ customerProfile }: CustomerProfileDisplayProps) {
+export function CustomerProfileCard({ customerProfile }: CustomerProfileCardProps) {
   const isB2B = customerProfile.type === 'B2B';
 
   return (

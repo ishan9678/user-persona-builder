@@ -1,7 +1,7 @@
 'use server';
 
 import { getGeminiModel } from './model';
-import { getPersonaChatContext } from './prompts';
+import { getPersonaChatContext } from './prompts/persona';
 import type { UserPersona, ProductProfile } from './types';
 
 export async function chatWithPersona(

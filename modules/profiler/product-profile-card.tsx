@@ -2,13 +2,13 @@
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { ProductProfile } from '../persona-generator/types';
+import type { ProductProfile } from '../llm/types';
 
-type ProductProfileDisplayProps = {
+type ProductProfileCardProps = {
   productProfile: ProductProfile;
 };
 
-export function ProductProfileDisplay({ productProfile }: ProductProfileDisplayProps) {
+export function ProductProfileCard({ productProfile }: ProductProfileCardProps) {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <h2 className="text-2xl font-black uppercase tracking-tight mb-6">
