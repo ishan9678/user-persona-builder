@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Loader2, Trash2 } from 'lucide-react';
+import { X, Loader2, Trash2, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { chatWithPersona } from '../persona-generator/chat-actions';
@@ -32,6 +32,33 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose, mes
       }];
       onMessagesChange(initialMessages);
     }
+  };
+
+  const handleExportChat = () => {
+    // Create markdown content from chat messages
+    const markdown = `# Chat with ${persona.name}
+
+**Persona:** ${persona.name}  
+**Demographic:** ${persona.demographic}  
+**Date:** ${new Date().toLocaleDateString()}
+
+---
+
+${messages.map((msg, idx) => {
+  const role = msg.role === 'user' ? '**You**' : `**${persona.name}**`;
+  return `### ${role}\n\n${msg.content}\n`;
+}).join('\n')}`;
+
+    // Download as markdown file
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chat-${persona.name.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleSend = async () => {
@@ -86,15 +113,26 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose, mes
           </div>
           <div className="flex gap-2">
             {messages.length > 1 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClearChat}
-                className="hover:bg-primary-foreground/20"
-                title="Clear chat history"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleExportChat}
+                  className="hover:bg-primary-foreground/20"
+                  title="Export chat to markdown"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClearChat}
+                  className="hover:bg-primary-foreground/20"
+                  title="Clear chat history"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
             )}
             <Button
               variant="ghost"
