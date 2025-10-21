@@ -20,6 +20,9 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
   const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
   const [personasList, setPersonasList] = useState<UserPersona[]>(personas);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  
+  // Store chat messages for each persona by their name
+  const [chatHistories, setChatHistories] = useState<Map<string, Array<{ role: 'user' | 'assistant'; content: string }>>>(new Map());
 
   const toggleCard = (index: number) => {
     setExpandedIndices(prev => {
@@ -39,6 +42,25 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
         prev.map((p, idx) => idx === editingIndex ? updatedPersona : p)
       );
     }
+  };
+
+  const getInitialMessages = (persona: UserPersona) => [
+    {
+      role: 'assistant' as const,
+      content: `Hi! I'm ${persona.name}, ${persona.demographic}. I'm here to help you understand my perspective as a user persona. Feel free to ask me anything about my needs, goals, or how I'd use your product!`
+    }
+  ];
+
+  const getChatHistory = (persona: UserPersona) => {
+    return chatHistories.get(persona.name) || getInitialMessages(persona);
+  };
+
+  const updateChatHistory = (persona: UserPersona, messages: Array<{ role: 'user' | 'assistant'; content: string }>) => {
+    setChatHistories(prev => {
+      const newMap = new Map(prev);
+      newMap.set(persona.name, messages);
+      return newMap;
+    });
   };
 
   const handleExport = async (persona: UserPersona, format: 'png' | 'pdf' | 'markdown', index: number) => {
@@ -158,6 +180,8 @@ export function UserPersonasDisplay({ personas, productProfile }: UserPersonasDi
           productProfile={productProfile}
           isOpen={true}
           onClose={() => setSelectedPersona(null)}
+          messages={getChatHistory(selectedPersona)}
+          onMessagesChange={(messages) => updateChatHistory(selectedPersona, messages)}
         />
       )}
 

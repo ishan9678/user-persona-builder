@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { chatWithPersona } from '../persona-generator/chat-actions';
@@ -12,28 +12,34 @@ type PersonaChatModalProps = {
   productProfile?: ProductProfile;
   isOpen: boolean;
   onClose: () => void;
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
+  onMessagesChange: (messages: Array<{ role: 'user' | 'assistant'; content: string }>) => void;
 };
 
 
-export function PersonaChatModal({ persona, productProfile, isOpen, onClose }: PersonaChatModalProps) {
+export function PersonaChatModal({ persona, productProfile, isOpen, onClose, messages, onMessagesChange }: PersonaChatModalProps) {
 
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
-    {
-      role: 'assistant',
-      content: `Hi! I'm ${persona.name}, ${persona.demographic}. I'm here to help you understand my perspective as a user persona. Feel free to ask me anything about my needs, goals, or how I'd use your product!`
-    }
-  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleClearChat = () => {
+    if (confirm('Are you sure you want to clear this chat history?')) {
+      const initialMessages = [{
+        role: 'assistant' as const,
+        content: `Hi! I'm ${persona.name}, ${persona.demographic}. I'm here to help you understand my perspective as a user persona. Feel free to ask me anything about my needs, goals, or how I'd use your product!`
+      }];
+      onMessagesChange(initialMessages);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input;
     // Add user message immediately
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    onMessagesChange([...messages, { role: 'user', content: userMessage }]);
     setInput('');
     setIsLoading(true);
 
@@ -42,22 +48,22 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose }: P
       const result = await chatWithPersona(persona, productProfile, userMessage, messages);
       
       if (result.success) {
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: result.message 
-        }]);
+        onMessagesChange([...messages, 
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: result.message }
+        ]);
       } else {
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'Sorry, I encountered an error. Please try again.' 
-        }]);
+        onMessagesChange([...messages,
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }
+        ]);
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.' 
-      }]);
+      onMessagesChange([...messages,
+        { role: 'user', content: userMessage },
+        { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -78,14 +84,27 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose }: P
             <h3 className="text-xl font-black uppercase">{persona.name}</h3>
             <p className="text-sm opacity-90">{persona.demographic}</p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="hover:bg-primary-foreground/20"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+          <div className="flex gap-2">
+            {messages.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearChat}
+                className="hover:bg-primary-foreground/20"
+                title="Clear chat history"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="hover:bg-primary-foreground/20"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -143,7 +162,6 @@ export function PersonaChatModal({ persona, productProfile, isOpen, onClose }: P
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Sending
                 </>
               ) : (
                 'Send'
