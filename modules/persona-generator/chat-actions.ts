@@ -2,10 +2,11 @@
 
 import { getGeminiModel } from './model';
 import { getPersonaChatContext } from './prompts';
-import type { UserPersona } from './types';
+import type { UserPersona, ProductProfile } from './types';
 
 export async function chatWithPersona(
   persona: UserPersona,
+  productProfile: ProductProfile | undefined,
   userMessage: string,
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }>
 ) {
@@ -13,7 +14,7 @@ export async function chatWithPersona(
     const model = getGeminiModel();
 
     // Build context about the persona using centralized prompt
-    const personaContext = getPersonaChatContext(persona);
+    const personaContext = getPersonaChatContext(persona, productProfile);
 
     // Build conversation messages
     const messages = [

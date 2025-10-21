@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -17,6 +18,7 @@ export function UrlInput({ onSubmit, processState }: UrlInputProps) {
   const [url, setUrl] = useState('');
   const [personaCount, setPersonaCount] = useState([3]);
   const [error, setError] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isProcessing = processState.stage !== 'idle' && 
                        processState.stage !== 'complete' && 
@@ -37,15 +39,30 @@ export function UrlInput({ onSubmit, processState }: UrlInputProps) {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <div className="text-center space-y-3">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-          User Persona Builder
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Transform any website into detailed user personas
-        </p>
+        <div className="flex items-center justify-center gap-3">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+            User Persona Builder 
+          </h1>
+          {processState.stage === 'complete' && (
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="rounded-full w-10 h-10 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]"
+            >
+              {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            </Button>
+          )}
+        </div>
+        {!isCollapsed && (
+          <p className="text-muted-foreground text-lg">
+            Transform any website into detailed user personas
+          </p>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {!isCollapsed && (
+        <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="url" className="text-sm font-bold uppercase tracking-wide">
             Website URL
@@ -100,6 +117,7 @@ export function UrlInput({ onSubmit, processState }: UrlInputProps) {
           {isProcessing ? 'Processing...' : 'Generate Personas'}
         </Button>
       </form>
+      )}
 
       {isProcessing && (
         <div className="space-y-3 p-6 border-2 border-black dark:border-white bg-muted/50">

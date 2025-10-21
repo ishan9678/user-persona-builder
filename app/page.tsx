@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { NavigationHeader } from '@/modules/landing/navigation-header';
 import { UrlInput } from '@/modules/landing/url-input';
 import { ProductProfileDisplay } from '@/modules/landing/product-profile-display';
 import { CustomerProfileDisplay } from '@/modules/landing/customer-profile-display';
@@ -102,8 +103,13 @@ export default function Home() {
     }
   };
 
+  const hasResults = !!(productProfile || customerProfile || personas);
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Sticky Navigation Header */}
+      <NavigationHeader showLinks={hasResults} />
+
       <main className="container mx-auto px-4 py-12 space-y-12">
         {/* URL Input Component */}
         <UrlInput onSubmit={handleSubmit} processState={processState} />
@@ -117,16 +123,24 @@ export default function Home() {
 
         {/* Product Profile Component */}
         {productProfile && (
-          <ProductProfileDisplay productProfile={productProfile} />
+          <section id="product-profile" className="scroll-mt-20">
+            <ProductProfileDisplay productProfile={productProfile} />
+          </section>
         )}
 
         {/* Customer Profile Component */}
         {customerProfile && (
-          <CustomerProfileDisplay customerProfile={customerProfile} />
+          <section id="customer-profile" className="scroll-mt-20">
+            <CustomerProfileDisplay customerProfile={customerProfile} />
+          </section>
         )}
 
         {/* User Personas Component */}
-        {personas && <UserPersonasDisplay personas={personas} />}
+        {personas && (
+          <section id="user-personas" className="scroll-mt-20">
+            <UserPersonasDisplay personas={personas} productProfile={productProfile} />
+          </section>
+        )}
       </main>
 
       <footer className="border-t-2 border-black dark:border-white mt-20 py-8">
